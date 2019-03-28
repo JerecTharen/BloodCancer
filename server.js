@@ -1,4 +1,6 @@
 const https = require('https');
+// const express = require('express');
+// const app = express();
 // const url = require('url');
 const querystring = require('querystring');
 
@@ -37,11 +39,28 @@ const req = https.request(options, (resp)=>{
         let theChunk = JSON.parse(chunk);
         console.log(theChunk);
         const TOKEN = theChunk.access_token;
+        let data;
         // console.log(`Token is ${TOKEN}`);
-        const newOptions = typeReq.opt(TOKEN);
+        const newOptions = {
+            method: 'GET',
+            hostname: 'api.petfinder.com',
+            path: '/v2/types',
+            headers: {
+                'Authorization': ` Bearer ${TOKEN}`
+            }
+        };
         // console.log(newOptions);
-        const newCallback = typeReq.call(TOKEN);
-        const newReq = typeReq.req(newOptions, newCallback);
+        const newCallback = (typeResp)=>{
+          console.log('In Type Request');
+          // console.log(`Token is: ${TOKEN}`);
+          console.log(`Status Code: ${typeResp.statusCode}`);
+          typeResp.on('data', (types)=>{
+              // console.log(JSON.parse(types));
+              data = JSON.parse(types);
+              console.log(data);
+          });
+        };
+        const newReq = https.request(newOptions, newCallback);
         newReq.end();
     });
 });
@@ -52,5 +71,7 @@ req.on('error', (err)=>{
 
 req.write(data);
 req.end();
+
+
 
 //Request for Animal Types
