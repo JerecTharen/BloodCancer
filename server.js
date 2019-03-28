@@ -1,19 +1,32 @@
 const https = require('https');
-// const express = require('express');
-// const app = express();
+const fs = require('fs');
+const express = require('express');
+const app = express();
 // const url = require('url');
 const querystring = require('querystring');
 
 const typeReq = require('./typeRequest');
 
+const EventEmitter = require('events');
+
+const port = 3030;
+
 const KEY = 'jSl1iprCRWa0cjtnf2XLZlFdSON5gXMjNyJibULzH7aemnnQij';
 const SECRET = '4fIVMoMQjZMkHtN96uXSw6kgWkqvhSFgCrEoPuWh';
+
+const DataEmitter = new EventEmitter();
+
+let AnimalTypes;
+DataEmitter.on('moarData', (moarData)=>{
+  console.log(moarData);
+  AnimalTypes = moarData;
+});
 
 // let TOKEN = '';
 
 // const url = new URL(`https://api.petfinder.com/v2/oauth2/token?grant_type=client_credentials&client_id=${KEY}&client_secret=${SECRET}`);
 
-const url = new URL('https://api.petfinder.com/v2/oauth2/token');
+// const url = new URL('https://api.petfinder.com/v2/oauth2/token');
 const data = querystring.stringify({
     grant_type: 'client_credentials',
     client_id: KEY,
@@ -57,7 +70,7 @@ const req = https.request(options, (resp)=>{
           typeResp.on('data', (types)=>{
               // console.log(JSON.parse(types));
               data = JSON.parse(types);
-              console.log(data);
+              DataEmitter.emit('moarData', data);
           });
         };
         const newReq = https.request(newOptions, newCallback);
@@ -72,6 +85,18 @@ req.on('error', (err)=>{
 req.write(data);
 req.end();
 
+app.get('/getTypes', (req, resp)=>{
+  resp.set({
+      'Access-Control-Allow-Origin': 'http://localhost:3000',
+      'Content-Type': 'application/json',
+      'Content-Length': AnimalTypes.length,
+  });
+  // console.log(resp.headers);
+  resp.json(AnimalTypes);
+});
 
+app.listen(port, ()=>{
+  console.log(`Listening on port ${port}`);
+});
 
 //Request for Animal Types
