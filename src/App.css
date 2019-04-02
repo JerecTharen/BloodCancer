@@ -1,5 +1,27 @@
 .App {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: #D7816A;
+}
+
+.App h1{
+  color: #F0CF65;
+}
+
+.animalTypeList{
+  list-style-type: none;
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+.animalType{
+  color: #64E9EE;
+}
+.animalType:hover{
+  color: #BCD0C7;
 }
 
 .App-logo {
@@ -30,4 +52,24 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.ourYellow{
+  color: #F0CF65;
+}
+
+.ourOrange{
+  color: #D7816A;
+}
+
+.ourLightBlue{
+  color: #BCD0C7;
+}
+
+.ourPurple{
+  color: #BD4F6C;
+}
+
+.ourNeonBlue{
+  color: #64E9EE;
 }
