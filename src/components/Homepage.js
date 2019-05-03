@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter as Link } from "react-router-dom";
 import '../App.css';
 
 class Homepage extends React.Component {
@@ -10,8 +11,11 @@ class Homepage extends React.Component {
   getTypes = ()=>{
     fetch("http://localhost:3030/getTypes").then(r => r.json())
       .then(typesData => {
+        console.log('types data is:', typesData);
         console.log(typesData.types);
-        this.setState({types: typesData.types});
+        if(typesData.types){
+          this.setState({types: typesData.types});
+        }
       });
   };
 
@@ -20,20 +24,33 @@ class Homepage extends React.Component {
     console.log(this.state.types);
   };
 
+  goToType = (path)=>{
+    return ()=>{
+      this.props.history.push(`/animalType/${path}`);
+    };
+  };
+
   render() {
     if(this.state.types.length > 0){
       console.log('in the right callback');
       let data = this.state.types.map((type)=>{
-        return (<li className='animalType' key={Math.random()}>{type.name}</li>);
+        let path ='';
+        let pathSplit = type._links.self.href.split('/');
+        pathSplit.forEach((urlParam)=>{
+          path += `${urlParam}-`;
+          console.log(path);
+        });
+        // console.log(typeof(type._links.self));
+        return (<li onClick={this.goToType(path)} className='animalType' key={type.name}>{type.name}</li>);
       });
-      console.log(data);
+      console.log('data is:', data);
       return (
         <div className="App">
           <h1>Animal Facts for Kids</h1>
           <img src="http://whatsonsouthwest.com/wp-content/uploads/2017/08/2017-08-BBC-The-Zoo-logo-small-777x437.jpg" alt="Animals" />
-          <ul className='animalTypeList'>
+          <div className='animalTypeList'>
             {data}
-          </ul>
+          </div>
         </div>
       );
     }
